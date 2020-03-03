@@ -1,5 +1,11 @@
 import sys
 import os
+import logging
+from _collections import deque
+
+browser_history = deque()
+
+logging.basicConfig(level=logging.DEBUG)
 
 args = sys.argv
 saved_tabs_directory = args[1]
@@ -36,7 +42,6 @@ Twitter and Square Chief Executive Officer Jack Dorsey
  addressed Apple Inc. employees at the iPhone maker’s headquarters
  Tuesday, a signal of the strong ties between the Silicon Valley giants.
 '''
-target_directory = f'{os.getcwd()}\\{saved_tabs_directory}'
 
 
 def create_directory():
@@ -48,16 +53,14 @@ def create_directory():
 
 
 def create_web_page_files(filename, content):
-    if os.getcwd() != target_directory:
-        os.chdir(f'{os.getcwd()}\\{saved_tabs_directory}')
-    with open(filename, 'w') as f:
+    with open(f'{os.getcwd()}\\{saved_tabs_directory}\\{filename}.txt', 'w') as f:
         f.write(content)
-        os.chdir('..')
+        f.flush()
 
 
 def read_web_page(filename):
-    if os.path.exists(filename):
-        with open(filename) as f:
+    if os.path.exists(f'{os.getcwd()}\\{saved_tabs_directory}\\{filename}.txt'):
+        with open(f'.\\{saved_tabs_directory}\\{filename}.txt') as f:
             print(f.read())
     else:
         print('Error: Incorrect URL')
@@ -66,22 +69,37 @@ def read_web_page(filename):
 def browser_loop():
     while True:
         command = input("Type URL: ")
-        if command == 'exit':
+        if command == 'back':
+            history_loop()
+        elif command == 'exit':
             return False
         elif command == 'bloomberg':
             read_web_page('bloomberg.txt')
+            browser_history.append(command)
         elif command == 'nytimes':
             read_web_page('nytimes.txt')
+            browser_history.append(command)
         elif '.' not in command:
             print("error")
         elif command == 'bloomberg.com':
             print(bloomberg_com)
             create_web_page_files('bloomberg.txt', bloomberg_com)
+            browser_history.append(command)
         elif command == 'nytimes.com':
             print(nytimes_com)
             create_web_page_files('nytimes.txt', nytimes_com)
+            browser_history.append(command)
         else:
             print('error')
+
+
+def history_loop():
+    if len(browser_history) != 0:
+        command = browser_history.pop()
+        if command == 'bloomberg' or command == 'bloomberg.com':
+            read_web_page('bloomberg.txt')
+        elif command == 'nytimes' or command == 'nytimes.com':
+            read_web_page('nytimes.txt')
 
 
 create_directory()
