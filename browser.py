@@ -1,11 +1,9 @@
 import sys
 import os
-import logging
 from _collections import deque
 
 browser_history = deque()
 
-logging.basicConfig(level=logging.DEBUG)
 
 args = sys.argv
 saved_tabs_directory = args[1]
@@ -53,17 +51,14 @@ def create_directory():
 
 
 def create_web_page_files(filename, content):
-    with open(f'{os.getcwd()}\\{saved_tabs_directory}\\{filename}.txt', 'w') as f:
+    with open(f'.\\{saved_tabs_directory}\\{filename}', 'w') as f:
         f.write(content)
         f.flush()
 
 
 def read_web_page(filename):
-    if os.path.exists(f'{os.getcwd()}\\{saved_tabs_directory}\\{filename}.txt'):
-        with open(f'.\\{saved_tabs_directory}\\{filename}.txt') as f:
-            print(f.read())
-    else:
-        print('Error: Incorrect URL')
+    with open(f'.\\{saved_tabs_directory}\\{filename}') as f:
+        print(f.read())
 
 
 def browser_loop():
@@ -75,27 +70,26 @@ def browser_loop():
             return False
         elif command == 'bloomberg':
             read_web_page('bloomberg.txt')
-            browser_history.append(command)
         elif command == 'nytimes':
             read_web_page('nytimes.txt')
-            browser_history.append(command)
         elif '.' not in command:
             print("error")
         elif command == 'bloomberg.com':
             print(bloomberg_com)
             create_web_page_files('bloomberg.txt', bloomberg_com)
-            browser_history.append(command)
         elif command == 'nytimes.com':
             print(nytimes_com)
             create_web_page_files('nytimes.txt', nytimes_com)
-            browser_history.append(command)
         else:
-            print('error')
+            print('Error: Incorrect URL')
+        browser_history.append(command)
 
 
 def history_loop():
+    command = ''
     if len(browser_history) != 0:
-        command = browser_history.pop()
+        for i in range(2):
+            command = browser_history.pop()
         if command == 'bloomberg' or command == 'bloomberg.com':
             read_web_page('bloomberg.txt')
         elif command == 'nytimes' or command == 'nytimes.com':
